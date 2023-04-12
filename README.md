@@ -24,3 +24,35 @@ The raw data can be found in the `Data` folder:
 - `brca_metabric_clinical_data.csv` is the clinical characteristics of the patients from cBioPortal
 - `Data_Compile.R`is the script to compile the genetic Z-score data with the patient clinical characteristics
 - `compiled_metabric_data.csv`is the final compiled dataset of both the genetic Z-score data and clinical data, produced from the compiler script
+- `Data_Cleaning.ipynb` is the script that cleans the data and splits the data into taining/validation/testing subsets
+- `cleaned_data.R` is the final cleaned dataset
+
+## Data Cleaning
+The following binary variables were recoded to be 0 or 1:
+- `Overall_Survival_Status`: Living (0) or Deceased (1)
+- `Chemotherapy`: No (0) or Yes (1)
+- `ER_status_measured_by_IHC`: Negative (0) or Positive (1)
+- `ER_status`: Negative (0) or Positive (1)
+- `HER2_status`: Negative (0) or Positive (1)
+- `PR_status`: Negative (0) or Positive (1)
+- `Hormone Therapy`: No (0) or Yes (1)
+- `Radio Therapy`: No (0) or Yes (1)
+- `Inferred_Menopausal_State`: Pre (0) or Post (1)
+- `Relapse_Free_Status`: Not Recurred (0) or Recurred (1)
+
+There were 717 individuals that had missing data in any of the clinical characteristics and were removed from that dataset.
+There were 22 genes that had missing Z-scores for all samples and were thus removed from the dataset.
+
+The final dimension size of the cleaned analytic dataset was 1263 patients and 1,093 predictors.
+
+One-hot encoding was done for the following categorical variables:
+- `Pam50___Claudin_low_subtype`
+- `Cancer_Type_Detailed`
+- `Oncotree_Code`
+- `Cellularity`
+- `Primary_Tumor_Laterality`
+- `Type_of_Breast_Surgery`
+- `Tumor_Other_Histologic_Subtype`
+- `HER2_status_measured_by_SNP6`
+
+The data was split into a training/validation/testing set by a ratio of 80:10:10. The training set had 1,010 patients, validation had 126 patients, and testing had 127 patients. 
