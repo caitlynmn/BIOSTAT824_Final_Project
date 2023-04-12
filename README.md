@@ -21,6 +21,7 @@ Visualizations will include exploratory data analysis plots of the clinical char
 ## Data Availability
 The raw data can be found in the `Data` folder:
 - `Zscores` folder contains the raw normalized Z-scores from cBioPortal for the cancer ganes
+- `Split_Data` folder contains the training, validation, and testing X and y datasets.
 - `brca_metabric_clinical_data.csv` is the clinical characteristics of the patients from cBioPortal
 - `Data_Compile.R`is the script to compile the genetic Z-score data with the patient clinical characteristics
 - `compiled_metabric_data.csv`is the final compiled dataset of both the genetic Z-score data and clinical data, produced from the compiler script
