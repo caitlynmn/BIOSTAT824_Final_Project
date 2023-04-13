@@ -9,14 +9,16 @@ output: html_document
 library(tidyverse)
 library(reshape2)
 library(gridExtra)
+library(flextable)
 ```
 
-# Read in data
+## Read in data
 ```{r}
-data <- read.csv("./data/cleaned_data.csv")
+data <- read.csv("../data/cleaned_data.csv")
 ```
 
-# Correlation heatmap
+# Genes
+## Correlation heatmap for genes
 ```{r, fig.width=8, fig.height=6}
 # Filter data for just 1066 genes
 genes <- data[,28:1093]
@@ -26,7 +28,7 @@ cormat <- round(cor(genes), 2)
 cormat <- melt(cormat)
 
 # Plot heatmap
-ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
+gene_heatmap <- ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
   geom_tile() +
   theme(axis.ticks.x=element_blank(),
         axis.text.x = element_blank(),
@@ -38,11 +40,12 @@ ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) +
   scale_fill_viridis_c() +
   ggtitle("Correlation Heatmap for Normalized Gene Expression Values") +
   theme(plot.title = element_text(face = "bold"))
+gene_heatmap
 ```
 
 Main takeaway is many of the 1066 genes are correlated (as expected), and we should consider using a dimension reduction technique such as PCA before using every gene as a predictor in a model. PCA will allow us to reduce the dimensionality to a set of linear combinations of the genes, called principal components, which are uncorrelated. This will improve efficiency of the methods as well as ideally capture most of the variance explained by the genes in a much smaller set of variables.
 
-# Correlation heatmap subset
+## Correlation heatmap subset
 ```{r, fig.width=8, fig.height=6}
 # Filter data for just highly correlated genes
 genes_sub <- data[,420:445]
@@ -52,7 +55,7 @@ cormat <- round(cor(genes_sub), 2)
 cormat <- melt(cormat)
 
 # Plot heatmap
-ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
+gene_heatmap_sub <- ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
   geom_tile() +
   xlab("Gene 1") +
   ylab("Gene 2") +
@@ -61,11 +64,12 @@ ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) +
   ggtitle("Correlation Heatmap for Subset of Normalized Gene Expression Values") +
   theme(plot.title = element_text(face = "bold"),
         axis.text.x = element_text(angle = 320))
+gene_heatmap_sub
 ```
 
 This subset of genes all encode for histone proteins. There are five main histone proteins that are involved in the structure of chromatin in eukaryotic cells: H1, H2A, H2B, H3, and H4. Histones are proteins that package DNA into nucleosomes (structural unit of DNA in eukaryotes). All of these genes code for proteins that serve a similar function, and thus we would expect them to be highly correlated. Since the dataset has genes in alphabetical order, a lot of the clusters of correlated genes near the diagonal of the correlation matrix likely belong to the same family of genes. This further supports the use of a dimension reduction technique such as PCA as there are likely many genes in the same family in the dataset.
 
-# PCA Genes
+## PCA Genes
 ```{r}
 # Calculate principal components
 pca_genes <- princomp(genes)
@@ -107,5 +111,34 @@ plotlist <- list(plot1, plot2, plot3)
 
 grid.arrange(grobs = plotlist, ncol = 1, 
              top = "Scatterplots Between First Three Principal Components by Cancer Type")
+```
+
+# Clinical characteristics
+## Distributions
+```{r, fig.width=8, fig.height=6}
+# Filter data for just clinical characteristics
+clinical <- data[,1:27]
+
+# View differences in survival status patients
+patients_1 <- clinical %>% filter(Overall_Survival_Status == 1)
+patients_0 <- clinical %>% filter(Overall_Survival_Status == 0)
+
+# Frequency of living and deceased
+freq <- clinical %>% group_by(Overall_Survival_Status) %>% summarise(Frequency = n())
+freq$Overall_Survival_Status <- c("Living", "Deceased")
+colnames(freq) <- c("Survival Status", "Frequency")
+freq <- freq %>% flextable() %>% theme_vanilla()
+freq
+
+# Distribution of age for each group
+clinical_new <- clinical %>% mutate(Overall_Survival_Status = recode(Overall_Survival_Status, `0` = 'Alive', `1` = 'Deceased'))
+ageplot <- ggplot(clinical_new, aes(x=Age_at_Diagnosis, group = as.factor(Overall_Survival_Status),
+                                fill = as.factor(Overall_Survival_Status))) + 
+  geom_density(alpha = 0.5) + 
+  labs(x="Age", y="Density", 
+       title="Density Histogram of Age by Survival Status") +
+  guides(fill=guide_legend(title="Survival Status")) +
+  theme(plot.title = element_text(face = "bold"))
+ageplot
 ```
 
