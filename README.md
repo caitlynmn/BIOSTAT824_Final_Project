@@ -21,12 +21,13 @@ Visualizations will include exploratory data analysis plots of the clinical char
 ## Data Availability
 The raw data can be found in the `Data` folder:
 - `Zscores` folder contains the raw normalized Z-scores from cBioPortal for the cancer ganes
-- `Split_Data` folder contains the training, validation, and testing X and y datasets.
+- `Split_Data` folder contains the training, validation, and testing X and y datasets. The files with PCA replace the genetic Z score data with the top 17 principal components derived from the genetic data.
 - `brca_metabric_clinical_data.csv` is the clinical characteristics of the patients from cBioPortal
 - `Data_Compile.R`is the script to compile the genetic Z-score data with the patient clinical characteristics
 - `compiled_metabric_data.csv`is the final compiled dataset of both the genetic Z-score data and clinical data, produced from the compiler script
-- `Data_Cleaning.ipynb` is the script that cleans the data and splits the data into taining/validation/testing subsets
+- `Data_Cleaning.ipynb` is the script that cleans the data as described below.
 - `cleaned_data.R` is the final cleaned dataset
+- `Data_Preprocessing.ipynb` is the script that pre-processes the data, derives principal components, and splits the data, as described below.
 
 ## Data Cleaning
 The following binary variables were recoded to be 0 or 1:
@@ -46,6 +47,8 @@ There were 22 genes that had missing Z-scores for all samples and were thus remo
 
 The final dimension size of the cleaned analytic dataset was 1263 patients and 1,093 predictors.
 
+## Data Pre-Processing
+
 One-hot encoding was done for the following categorical variables:
 - `Pam50___Claudin_low_subtype`
 - `Cancer_Type_Detailed`
@@ -55,5 +58,18 @@ One-hot encoding was done for the following categorical variables:
 - `Type_of_Breast_Surgery`
 - `Tumor_Other_Histologic_Subtype`
 - `HER2_status_measured_by_SNP6`
+- `Neoplasm_Histologic_Grade`
+- `Tumor_Stage`
 
-The data was split into a training/validation/testing set by a ratio of 80:10:10. The training set had 1,010 patients, validation had 126 patients, and testing had 127 patients. 
+The following continuous clinical variables were standardized:
+- `Age_at_Diagnosis`
+- `Lymph_nodes_examined_positive`
+- `Mutation_Count`
+- `Nottingham_prognostic_index`
+- `Relapse_Free_Status__Months_`
+
+Principal Component Analysis (PCA) was used to reduce dimensionality. The principal components using the genetic Z-score data was found. Taking the top 17 components resulted in a great reduction of loss and dimension from the original 1,066 gene expression Z-score predictors.
+
+The data was split into a training/validation/testing set by a ratio of 80:10:10. The training set had 1,009 patients, validation had 127 patients, and testing had 127 patients.
+
+Included in the `Data` -> `Split_Data` folder is the splitting into training, validation, and testing subsets of the full pre-processed datasets and the PCA datasets which contain the pre-processed clinical data along with the 17 principal components.
