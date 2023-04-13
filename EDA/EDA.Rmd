@@ -1,0 +1,111 @@
+---
+title: "EDA"
+author: "Costa Stavrianidis"
+date: "2023-04-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(reshape2)
+library(gridExtra)
+```
+
+# Read in data
+```{r}
+data <- read.csv("./data/cleaned_data.csv")
+```
+
+# Correlation heatmap
+```{r, fig.width=8, fig.height=6}
+# Filter data for just 1066 genes
+genes <- data[,28:1093]
+
+# Create correlation heatmap
+cormat <- round(cor(genes), 2)
+cormat <- melt(cormat)
+
+# Plot heatmap
+ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  theme(axis.ticks.x=element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.y=element_blank(),
+        axis.text.y = element_blank()) +
+  xlab("Gene 1") +
+  ylab("Gene 2") +
+  labs(fill = "Correlation Coefficient") +
+  scale_fill_viridis_c() +
+  ggtitle("Correlation Heatmap for Normalized Gene Expression Values") +
+  theme(plot.title = element_text(face = "bold"))
+```
+
+Main takeaway is many of the 1066 genes are correlated (as expected), and we should consider using a dimension reduction technique such as PCA before using every gene as a predictor in a model. PCA will allow us to reduce the dimensionality to a set of linear combinations of the genes, called principal components, which are uncorrelated. This will improve efficiency of the methods as well as ideally capture most of the variance explained by the genes in a much smaller set of variables.
+
+# Correlation heatmap subset
+```{r, fig.width=8, fig.height=6}
+# Filter data for just highly correlated genes
+genes_sub <- data[,420:445]
+
+# Create correlation heatmap
+cormat <- round(cor(genes_sub), 2)
+cormat <- melt(cormat)
+
+# Plot heatmap
+ggplot(data = cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  xlab("Gene 1") +
+  ylab("Gene 2") +
+  labs(fill = "Correlation Coefficient") +
+  scale_fill_viridis_c() +
+  ggtitle("Correlation Heatmap for Subset of Normalized Gene Expression Values") +
+  theme(plot.title = element_text(face = "bold"),
+        axis.text.x = element_text(angle = 320))
+```
+
+This subset of genes all encode for histone proteins. There are five main histone proteins that are involved in the structure of chromatin in eukaryotic cells: H1, H2A, H2B, H3, and H4. Histones are proteins that package DNA into nucleosomes (structural unit of DNA in eukaryotes). All of these genes code for proteins that serve a similar function, and thus we would expect them to be highly correlated. Since the dataset has genes in alphabetical order, a lot of the clusters of correlated genes near the diagonal of the correlation matrix likely belong to the same family of genes. This further supports the use of a dimension reduction technique such as PCA as there are likely many genes in the same family in the dataset.
+
+# PCA Genes
+```{r}
+# Calculate principal components
+pca_genes <- princomp(genes)
+pca_sum <- summary(pca_genes)
+
+# Screeplot
+screeplot(pca_sum, type = "lines", main = "Screeplot")
+
+# Calculate proportion of variance for each component
+pov <- pca_sum$sdev^2/sum(pca_sum$sdev^2)
+
+# Calculate cumulative proportion of variance for each component
+pov_cum <- cumsum(pov)
+
+# Top three genes that contribute the most variance from top three PC's
+sort(abs(pca_sum$loadings[,1]), decreasing = T)[1:5]
+sort(abs(pca_sum$loadings[,2]), decreasing = T)[1:5]
+sort(abs(pca_sum$loadings[,3]), decreasing = T)[1:5]
+
+# Create dataframe of principle components with their scores and cancer type for each
+# observation
+pc_3 <- pca_genes$scores[,1:3]
+pc_3_cancer <- data.frame(pc_3, as.factor(data$Cancer_Type_Detailed))
+colnames(pc_3_cancer) <- c("PC1", "PC2", "PC3", "Cancer Type")
+```
+
+```{r, fig.height=10}
+# Plot scatterplots
+plot1 <- ggplot(pc_3_cancer, aes(x = PC1, y = PC2, color = `Cancer Type`, shape = `Cancer Type`)) + 
+  geom_point() + scale_color_manual(values = c("red", "blue", "green", "yellow", "orange"))
+
+plot2 <- ggplot(pc_3_cancer, aes(x = PC1, y = PC3, color = `Cancer Type`, shape = `Cancer Type`)) + 
+  geom_point() + scale_color_manual(values = c("red", "blue", "green", "yellow", "orange"))
+
+plot3 <- ggplot(pc_3_cancer, aes(x = PC2, y = PC3, color = `Cancer Type`, shape = `Cancer Type`)) + 
+  geom_point() + scale_color_manual(values = c("red", "blue", "green", "yellow", "orange"))
+
+plotlist <- list(plot1, plot2, plot3)
+
+grid.arrange(grobs = plotlist, ncol = 1, 
+             top = "Scatterplots Between First Three Principal Components by Cancer Type")
+```
+
