@@ -10,13 +10,7 @@ We are interested in: </br>
 2) Investigating the association between gene expression profiles and tumor stage.
 
 **Dataset:** </br>
-The data of interest is from the Molecular Taxonomy of Breast Cancer International Consortium (METABRIC) study which can be found on the cBioPortal (https://www.cbioportal.org/study/summary?id=brca_metabric). Our final study dataset consists of 1,980 breast cancer patients and includes various clinical characteristics and normalized gene expression profiles. The 36 clinical characteristics include variables such as age at diagnosis, chemotherapy status, and type of breast cancer surgery. The relative expression of an individual gene and tumor to the gene's expression distribution in a reference population was calculated as the mRNA Z-scores for 1,088 genes, identified as cancer genes by OncoKB. The outcomes of interest were the binary survival status of patients at the end of the study (0 =  living and 1 = death from cancer) and the multi-class tumor stage (stage 1 through 4).
-
-**Machine Learning Approach:** </br>
-We plan to construct a LASSO-penalized linear regression as a baseline model, random forest as a tree-based ensemble, a support-vector machine, and a multi-layer perceptron for a neural network. All models will be developed in Python. The dataset will be split into a training, validation, and testing set in the respective ratio of 80:10:10. As such, 1,584 patients will be in the training set, 198 patients in the validation set, and 198 patients in the testing set. Parameters for the models will be determined by using 5-fold cross-validation on the training dataset.
-
-**Visualization Approach:** </br>
-Visualizations will include exploratory data analysis plots of the clinical characteristics, a gene expression matrix which depicts the gene expression across all samples and genes, ROC curves of the final model predictions, and a feature importance plot of gene expression on tumor stage.
+The data of interest is from the Molecular Taxonomy of Breast Cancer International Consortium (METABRIC) study which can be found on the cBioPortal (https://www.cbioportal.org/study/summary?id=brca_metabric). Our final study dataset consists of 1,980 breast cancer patients and includes various clinical characteristics and normalized gene expression profiles. The 36 clinical characteristics include variables such as age at diagnosis, chemotherapy status, and type of breast cancer surgery. The relative expression of an individual gene and tumor to the gene's expression distribution in a reference population was calculated as the mRNA Z-scores for 1,088 genes, identified as cancer genes by OncoKB. The outcome of interest were the binary survival status of patients at the end of the study (0 =  living and 1 = death from cancer).
 
 ## Data Availability
 The raw data can be found in the `Data` folder:
@@ -45,7 +39,7 @@ The following binary variables were recoded to be 0 or 1:
 There were 717 individuals that had missing data in any of the clinical characteristics and were removed from that dataset.
 There were 22 genes that had missing Z-scores for all samples and were thus removed from the dataset.
 
-The final dimension size of the cleaned analytic dataset was 1263 patients and 1,093 predictors.
+The final dimension size of the cleaned analytic dataset was 1,263 patients and 1,093 predictors.
 
 ## Data Pre-Processing
 
@@ -67,6 +61,7 @@ The following continuous clinical variables were standardized:
 - `Mutation_Count`
 - `Nottingham_prognostic_index`
 - `Relapse_Free_Status__Months_`
+- `Tumor_Size`
 
 Principal Component Analysis (PCA) was used to reduce dimensionality. The principal components using the genetic Z-score data was found. Taking the top 17 components resulted in a great reduction of loss and dimension from the original 1,066 gene expression Z-score predictors.
 
