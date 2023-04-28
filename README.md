@@ -35,6 +35,7 @@ The following binary variables were recoded to be 0 or 1:
 - `Radio Therapy`: No (0) or Yes (1)
 - `Inferred_Menopausal_State`: Pre (0) or Post (1)
 - `Relapse_Free_Status`: Not Recurred (0) or Recurred (1)
+- `Primary_Tumor_Laterality`: Left (0) or Right (1)
 
 There were 717 individuals that had missing data in any of the clinical characteristics and were removed from that dataset.
 There were 22 genes that had missing Z-scores for all samples and were thus removed from the dataset.
@@ -48,7 +49,6 @@ One-hot encoding was done for the following categorical variables:
 - `Cancer_Type_Detailed`
 - `Oncotree_Code`
 - `Cellularity`
-- `Primary_Tumor_Laterality`
 - `Type_of_Breast_Surgery`
 - `Tumor_Other_Histologic_Subtype`
 - `HER2_status_measured_by_SNP6`
