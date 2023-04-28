@@ -61,6 +61,7 @@ The following continuous clinical variables were standardized:
 - `Mutation_Count`
 - `Nottingham_prognostic_index`
 - `Relapse_Free_Status__Months_`
+- `TMB__nonsynonymous_`
 - `Tumor_Size`
 
 Principal Component Analysis (PCA) was used to reduce dimensionality. The principal components using the genetic Z-score data was found. Taking the top 17 components resulted in a great reduction of loss and dimension from the original 1,066 gene expression Z-score predictors.
